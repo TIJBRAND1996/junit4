@@ -44,7 +44,10 @@ public class ParameterizedNamesTest {
         Request request = Request.aClass(ParameterizedWithSpecialCharsInName.class);
         for (Description parent : request.getRunner().getDescription().getChildren()) {
             for (Description description : parent.getChildren()) {
-                assertEquals("test" + parent.getDisplayName(), description.getMethodName());
+                assertEquals("test", description.getMethodName());
+                assertEquals("test" + parent.getDisplayName()
+                        + "(org.junit.runners.parameterized.ParameterizedNamesTest$ParametrizedWithSpecialCharsInName)",
+                        description.getDisplayName());
             }
         }
     }

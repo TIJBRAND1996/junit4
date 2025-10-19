@@ -25,6 +25,7 @@ import org.junit.internal.runners.statements.RunBefores;
 import org.junit.rules.MethodRule;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
+import org.junit.runner.DescriptionBuilder;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.FrameworkMember;
 import org.junit.runners.model.FrameworkMethod;
@@ -61,8 +62,6 @@ import org.junit.validator.TestClassValidator;
  * @since 4.5
  */
 public class BlockJUnit4ClassRunner extends ParentRunner<FrameworkMethod> {
-    private static TestClassValidator PUBLIC_CLASS_VALIDATOR = new PublicClassValidator();
-
     private final ConcurrentMap<FrameworkMethod, Description> methodDescriptions = new ConcurrentHashMap<FrameworkMethod, Description>();
 
     /**
@@ -118,12 +117,18 @@ public class BlockJUnit4ClassRunner extends ParentRunner<FrameworkMethod> {
         Description description = methodDescriptions.get(method);
 
         if (description == null) {
-            description = Description.createTestDescription(getTestClass().getJavaClass(),
-                    testName(method), method.getAnnotations());
+            description = DescriptionBuilder.forMethod(getTestClass().getJavaClass(), method.getMethod())
+                    .withDisplayName(formatDisplayName(testName(method)))
+                    .createTestDescription();
             methodDescriptions.putIfAbsent(method, description);
         }
 
         return description;
+    }
+
+    private String formatDisplayName(String testName) {
+        String className = getTestClass().getJavaClass().getName();
+        return String.format("%s(%s)", testName, className);
     }
 
     @Override
